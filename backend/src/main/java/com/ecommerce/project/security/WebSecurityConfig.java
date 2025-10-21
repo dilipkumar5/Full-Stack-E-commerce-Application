@@ -132,8 +132,8 @@ public class WebSecurityConfig {
                 userRepository.save(seller1);
             }
             if(!userRepository.existsByUserName("admin")){
-                User admin1 = new User("admin1", "admin1@example.com", passwordEncoder.encode("adminpass"));
-                userRepository.save(admin1);
+                User admin = new User("admin", "admin@example.com", passwordEncoder.encode("adminpass"));
+                userRepository.save(admin);
             }
 
             // Update roles for existing users
