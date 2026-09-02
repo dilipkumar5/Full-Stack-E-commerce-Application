@@ -43,7 +43,6 @@ public class JwtUtils {
     public String getJwtFromCookies(HttpServletRequest request){
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
         if(cookie != null){
-            System.out.println("COOKIE: "+ cookie.getValue());
             return cookie.getValue();
         } else {
             return null;
@@ -92,7 +91,6 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            System.out.println("Validate");
             Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(authToken);
             return true;
         } catch (MalformedJwtException e) {

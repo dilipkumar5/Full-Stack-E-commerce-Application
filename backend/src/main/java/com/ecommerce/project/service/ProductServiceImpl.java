@@ -92,9 +92,9 @@ public class ProductServiceImpl implements ProductService{
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .toList();
         // check if product size is 0
-        if(productList.isEmpty()){
-            throw new APIException("No products exist");
-        }
+//        if(productList.isEmpty()){
+//            throw new APIException("No products exist");
+//        }
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
         productResponse.setPageNumber(pageProducts.getNumber());

@@ -65,31 +65,34 @@ public class AddressServiceImpl implements AddressService{
 
     @Override
     public AddressDTO updateAddressById(Long addressId, AddressDTO addressDTO) {
-        Address address = addressRepository.findById(addressId)
+        Address addressFromDatabase = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("address", "addressId", addressId));
 
-        address.setStreet(addressDTO.getStreet());
-        address.setBuildingName(addressDTO.getBuildingName());
-        address.setCity(addressDTO.getCity());
-        address.setStateName(addressDTO.getStateName());
-        address.setCountry(addressDTO.getCountry());
-        address.setZipcode(addressDTO.getZipcode());
+        addressFromDatabase.setStreet(addressDTO.getStreet());
+        addressFromDatabase.setBuildingName(addressDTO.getBuildingName());
+        addressFromDatabase.setCity(addressDTO.getCity());
+        addressFromDatabase.setStateName(addressDTO.getStateName());
+        addressFromDatabase.setCountry(addressDTO.getCountry());
+        addressFromDatabase.setZipcode(addressDTO.getZipcode());
 
-        Address updatedAddress = addressRepository.save(address);
+        Address updatedAddress = addressRepository.save(addressFromDatabase);
 
-//        User user = addressFromDb.getUser();
-//        user.getAddresses().removeIf(address -> address.getAddressId().equals(addressId));
-//        user.getAddresses().add(updatedAddress);
-//        userRepository.save(user);
+        User user = addressFromDatabase.getUser();
+        user.getAddresses().removeIf(currentAddress -> currentAddress.getAddressId().equals(addressId));
+        user.getAddresses().add(updatedAddress);
+        userRepository.save(user);
 
         return modelMapper.map(updatedAddress, AddressDTO.class);
     }
 
     @Override
     public String deleteAddress(Long addressId) {
-        Address address = addressRepository.findById(addressId)
+        Address addressFromDatabase = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("address", "addressId", addressId));
-        addressRepository.delete(address);
+        User user = addressFromDatabase.getUser();
+        user.getAddresses().removeIf(address -> address.getAddressId().equals(addressId));
+        userRepository.save(user);
+        addressRepository.delete(addressFromDatabase);
         return "Address has been deleted successfully with addressId: " + addressId ;
     }
 }
