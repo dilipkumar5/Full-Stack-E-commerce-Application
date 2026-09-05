@@ -4,11 +4,17 @@ import com.ecommerce.project.payload.OrderDTO;
 import com.ecommerce.project.payload.OrderRequestDTO;
 import com.ecommerce.project.service.OrderService;
 import com.ecommerce.project.util.AuthUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Order APIs", description = "APIs for placing and managing orders")
 @RestController
 @RequestMapping("/api")
 public class OrderController {
@@ -20,6 +26,16 @@ public class OrderController {
     AuthUtil authUtil;
 
     @PostMapping("/order/users/payments/{paymentMethod}")
+    @Operation(
+            summary = "Place Order",
+            description = "API to place an order for the logged-in user using the selected payment method"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Order placed successfully"),
+            @ApiResponse(responseCode = "400", description = "Cart is empty", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Cart or address not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+    })
     public ResponseEntity<OrderDTO> orderProducts(@PathVariable String paymentMethod,
                                                   @RequestBody OrderRequestDTO orderRequestDTO){
         String emailId = authUtil.loggedInEmail();

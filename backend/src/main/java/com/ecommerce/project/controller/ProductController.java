@@ -5,6 +5,11 @@ import com.ecommerce.project.model.Product;
 import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Tag(name = "Product APIs", description = "APIs for managing products")
 @RestController
 @RequestMapping("/api")
 public class ProductController {
@@ -22,6 +28,16 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping("/admin/categories/{categoryId}/product")
+    @Operation(
+            summary = "Create Product",
+            description = "API to create a new product under a specific category"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Product created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input or product already exists", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Category not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+    })
     public ResponseEntity<ProductDTO> addProduct(@Valid @RequestBody ProductDTO productDTO,
                                                  @PathVariable Long categoryId){
         ProductDTO savedProductDTO = productService.addProduct(productDTO, categoryId);
@@ -29,6 +45,15 @@ public class ProductController {
     }
 
     @GetMapping("/public/products")
+    @Operation(
+            summary = "Get All Products",
+            description = "API to retrieve all products with pagination and sorting"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid pagination or sorting parameters", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+    })
     public ResponseEntity<ProductResponse> getAllProducts(
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
@@ -42,6 +67,16 @@ public class ProductController {
     }
 
     @GetMapping("/public/categories/{categoryId}/products")
+    @Operation(
+            summary = "Get Products By Category",
+            description = "API to retrieve products belonging to a specific category with pagination and sorting"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Category not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid pagination or sorting parameters", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+    })
     public ResponseEntity<ProductResponse> getProductsByCategory(@PathVariable Long categoryId,
                                                                  @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
                                                                  @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
@@ -53,6 +88,15 @@ public class ProductController {
     }
 
     @GetMapping("/public/products/keyword/{keyword}")
+    @Operation(
+            summary = "Search Products By Keyword",
+            description = "API to search products by product name keyword with pagination and sorting"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid pagination or sorting parameters", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+    })
     public ResponseEntity<ProductResponse> getProductsBySearchName(@PathVariable String keyword,
                                                                    @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
                                                                    @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
@@ -63,6 +107,16 @@ public class ProductController {
     }
 
     @PutMapping("/admin/products/{productId}")
+    @Operation(
+            summary = "Update Product",
+            description = "API to update an existing product by product ID"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+    })
     public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO productDTO,
                                                     @PathVariable Long productId){
         ProductDTO updatedProductDTO = productService.updateProduct(productId, productDTO);
@@ -70,12 +124,30 @@ public class ProductController {
     }
 
     @DeleteMapping("/admin/products/{productId}")
+    @Operation(
+            summary = "Delete Product",
+            description = "API to delete a product by product ID"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)
+    })
     public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId){
         ProductDTO deletedProductDTO = productService.deleteProduct(productId);
         return new ResponseEntity<>(deletedProductDTO, HttpStatus.OK);
     }
 
     @PutMapping("/products/{productId}/image")
+    @Operation(
+            summary = "Update Product Image",
+            description = "API to upload or update the image of a product by product ID"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Product image updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Product not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error while uploading image", content = @Content)
+    })
     public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId,
                                                          @RequestParam("image") MultipartFile image) throws IOException {
         ProductDTO updatedProduct = productService.updateProductImage(productId, image);
