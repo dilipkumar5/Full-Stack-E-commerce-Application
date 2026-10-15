@@ -10,6 +10,8 @@ import Cart from './Components/cart/Cart';
 import Login from './Components/auth/Login';
 import PrivateRoute from './Components/PrivateRoute';
 import Register from './Components/auth/Register';
+import Checkout from './Components/checkout/Checkout';
+import PaymentConfirmation from './Components/checkout/PaymentConfirmation';
 
 function App() {
   return (
@@ -21,12 +23,19 @@ function App() {
           <Route path='/products' element={ <Products/> }/>
           <Route path='/about' element = { <About/> }/>
           <Route path='/contact' element = { <Contact/> }/>
-          <Route path='/cart' element = { <Cart/> }/>
           
+
+          <Route path='/' element = { <PrivateRoute/> }>
+            <Route path='/checkout' element = { <Checkout/> }/>
+            <Route path='/cart' element = { <Cart/> }/>
+            <Route path='/order-confirm' element = { <PaymentConfirmation/> }/>
+          </Route>
+
           <Route path='/' element = { <PrivateRoute publicPage/> }>
             <Route path='/login' element = { <Login/> }/>
             <Route path='/register' element = { <Register/> }/>
           </Route>
+
         </Routes>
       </Router>
       <Toaster position='bottom-center'/>

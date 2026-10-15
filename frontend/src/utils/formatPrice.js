@@ -6,3 +6,8 @@ const formatPrice = (amount) => {
 }
 
 export default formatPrice;
+
+
+export const formatPriceCalculation = (quantity, amount) => {
+    return (Number(quantity) * Number(amount)).toFixed(2);
+}

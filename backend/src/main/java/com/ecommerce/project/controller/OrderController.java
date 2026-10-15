@@ -2,8 +2,12 @@ package com.ecommerce.project.controller;
 
 import com.ecommerce.project.payload.OrderDTO;
 import com.ecommerce.project.payload.OrderRequestDTO;
+import com.ecommerce.project.payload.StripePaymentDTO;
 import com.ecommerce.project.service.OrderService;
+import com.ecommerce.project.service.StripeService;
 import com.ecommerce.project.util.AuthUtil;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +29,9 @@ public class OrderController {
     @Autowired
     AuthUtil authUtil;
 
+    @Autowired
+    StripeService stripeService;
+
     @PostMapping("/order/users/payments/{paymentMethod}")
     @Operation(
             summary = "Place Order",
@@ -39,6 +46,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> orderProducts(@PathVariable String paymentMethod,
                                                   @RequestBody OrderRequestDTO orderRequestDTO){
         String emailId = authUtil.loggedInEmail();
+        System.out.println(orderRequestDTO);
         OrderDTO order = orderService.placeOrder(
                 emailId,
                 orderRequestDTO.getAddressId(),
@@ -52,4 +60,12 @@ public class OrderController {
         return new ResponseEntity<OrderDTO>(order,HttpStatus.CREATED);
 
     }
+
+    @PostMapping("/order/stripe-client-secret")
+    public ResponseEntity<String> createStripeClientSecret(@RequestBody StripePaymentDTO stripePaymentDTO) throws StripeException {
+        System.out.println("StripePaymentDto received: " + stripePaymentDTO );
+        PaymentIntent paymentIntent = stripeService.paymentIntent(stripePaymentDTO);
+        return new ResponseEntity<>(paymentIntent.getClientSecret(), HttpStatus.CREATED);
+    }
+
 }
